@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Cookie Recipe Manager</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🍪 Cookie Recipe Manager</h1>
+    </header>
+    
+    <div class="nav-links">
+      <a href="/">Home</a>
+      <a href="/guestbook">Guest Book</a>
+    </div>
+    
+    <div class="input-group">
+      <input type="text" id="recipe" placeholder="Enter your cookie recipe name">
+      <button onclick="submitRecipe()">Save Recipe</button>
+    </div>
+    
+    <ul id="recipeList"></ul>
+  </div>
+
+  <footer>
+    &copy; 2025 Cookie Recipe Manager - Made with ❤️
+  </footer>
+
+  <script>
+    // Function to submit a new recipe to the backend
+    async function submitRecipe() {
+      const recipe = document.getElementById("recipe").value;
+      if (!recipe.trim()) {
+        alert("Please enter a recipe name!");
+        return;
+      }
+      
+      await fetch('/cookie/add', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ recipe })
+      });
+      document.getElementById("recipe").value = "";
+      loadRecipes(); // Refresh the list after adding
+    }
+
+    // Function to load and display all recipes from the backend
+    async function loadRecipes() {
+      const res = await fetch('/cookie/list');
+      const recipes = await res.json();
+      const recipeList = document.getElementById("recipeList");
+      
+      if (recipes.length === 0) {
+        recipeList.innerHTML = '<div class="empty-list">No recipes yet. Add your first cookie recipe!</div>';
+      } else {
+        recipeList.innerHTML = recipes.map(r => `<li>${r}</li>`).join('');
+      }
+    }
+
+    // Load recipes when the page first loads
+    loadRecipes();
+  </script>
+</body>
+</html>

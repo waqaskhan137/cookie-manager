@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Guest Book</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>📝 Guest Book</h1>
+    </header>
+    
+    <div class="nav-links">
+      <a href="/">Cookie Recipes</a>
+      <a href="/guestbook">Guest Book</a>
+    </div>
+    
+    <div class="input-group">
+      <input type="text" id="name" placeholder="Enter your name">
+      <button onclick="submitName()">Sign Guestbook</button>
+    </div>
+    
+    <ul id="guestList"></ul>
+  </div>
+
+  <footer>
+    &copy; 2025 Cookie Recipe Manager - Made with ❤️
+  </footer>
+
+  <script>
+    async function submitName() {
+      const name = document.getElementById("name").value;
+      if (!name.trim()) {
+        alert("Please enter your name!");
+        return;
+      }
+      
+      await fetch('/guestbook/add', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ name })
+      });
+      document.getElementById("name").value = "";
+      loadNames();
+    }
+
+    async function loadNames() {
+      const res = await fetch('/guestbook/list');
+      const names = await res.json();
+      const guestList = document.getElementById("guestList");
+      
+      if (names.length === 0) {
+        guestList.innerHTML = '<div class="empty-list">No guests yet. Be the first to sign!</div>';
+      } else {
+        guestList.innerHTML = names.map(n => `<li>${n}</li>`).join('');
+      }
+    }
+
+    loadNames();
+  </script>
+</body>
+</html>
